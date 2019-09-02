@@ -2,18 +2,18 @@
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import ScrumyGoals, GoalStatus
+from .models import ScrumyGoals, GoalStatus, User
 from  account.models import ScrumUser
 
-User = get_user_model()
+# User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
+        # extra_kwargs = {
+        #     'password': {'write_only': True}
+        # }
 
 class GoalStatusSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,7 +52,7 @@ class ScrumUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ScrumUser
-        fields = ('username', 'full_name', 'user_type', 'password', 'ScrumyGoals')
+        fields = ('id','username', 'full_name', 'user_type', 'password', 'ScrumyGoals')
         extra_kwargs = {
             'password': {'write_only': True}
         }

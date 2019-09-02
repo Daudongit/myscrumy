@@ -2,7 +2,7 @@ from django.db import models
 from django.shortcuts import reverse
 from django.contrib.auth import get_user_model
 
-User = get_user_model()
+AuthUser = get_user_model()
 
 class GoalStatus(models.Model):
     status_name = models.CharField(max_length=20)
@@ -17,7 +17,7 @@ class ScrumyGoals(models.Model):
     moved_by = models.CharField(max_length=50)
     owner = models.CharField(max_length=50)
     goal_status = models.ForeignKey(GoalStatus, on_delete=models.PROTECT)
-    user = models.ForeignKey(User, related_name='ScrumyGoals', on_delete=models.CASCADE)
+    user = models.ForeignKey(AuthUser, related_name='ScrumyGoals', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.goal_name
@@ -38,3 +38,7 @@ class ScrumyHistory(models.Model):
 
     def __str__(self):
         return self.moved_by
+
+class User(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)

@@ -10,14 +10,12 @@ from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication 
 from account.models import ScrumUser
 from .csrf_exempt import CsrfExemptSessionAuthentication
-from .models import ScrumyGoals, GoalStatus
+from .models import ScrumyGoals, GoalStatus, User
 from .serializers import (ScrumGoalSerializer, ScrumUserSerializer,
                           UserSerializer)
 
 # from rest_framework import permissions
 
-
-User = get_user_model()
 
 class ScrumUserViewSet(viewsets.ModelViewSet):
     queryset = ScrumUser.objects.all()
@@ -63,7 +61,8 @@ class UserViewSet(viewsets.ModelViewSet):
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
-            serializer = self.serializer_class(user)
+            serializer = ScrumUserSerializer(user)
+            # serializer = self.serializer_class(user)
             return Response({'success': 'ok'}, status=status.HTTP_200_OK)
             # return Response(serializer.data, status=status.HTTP_200_OK)
         raise AuthenticationFailed
