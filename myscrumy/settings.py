@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'daudonmailscrumy',
     'account',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders'
 ]
 
@@ -95,17 +96,17 @@ DATABASES = {
             'autocommit': True,
         }
     }
-# 'default': {
-#     'ENGINE': 'mysql.connector.django',
-#     'NAME': 'django',
-#     'USER':'root',
-#     'PASSWORD':'',
-#     'HOST':'127.0.0.1',
-#     'PORT':'3306',
-#     'OPTIONS': {
-#       'autocommit': True,
-#     }
-# }
+    # 'default': {
+    #     'ENGINE': 'mysql.connector.django',
+    #     'NAME': 'django',
+    #     'USER':'root',
+    #     'PASSWORD':'',
+    #     'HOST':'127.0.0.1',
+    #     'PORT':'3306',
+    #     'OPTIONS': {
+    #       'autocommit': True,
+    #     }
+    # }
 
 }
 
@@ -152,9 +153,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
+
     # 'DEFAULT_PERMISSION_CLASSES': [
     #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    # ]
+    # ],
+    # 'DEFAULT_AUTHENTICATION_CLASSES':(
+    #     'rest_framework.authentication.TokenAuthentication',
+    # )
 }
 
 SESSION_COOKIE_SAMESITE = None

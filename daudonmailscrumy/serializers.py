@@ -28,6 +28,11 @@ class ScrumGoalSerializer(serializers.ModelSerializer):
             goal_status=GoalStatus.objects.get(status_name="Weekly Goal"),
             **validated_data
         )
+    
+    # def update(self, instance, validated_data):
+    #     # goal_status = validated_data.pop('goal_status')
+    #     # instance.goal_status_id = goal_status.id
+    #     return instance
 
     class Meta:
         model = ScrumyGoals

@@ -21,6 +21,7 @@ class ScrumUserManager(BaseUserManager):
             raise TypeError('Superusers must have a password.')
 
         user = self.create_user(username, password)
+        user.user_type = 'O'
         user.is_superuser = True
         user.is_staff = True
         user.is_admin = True
