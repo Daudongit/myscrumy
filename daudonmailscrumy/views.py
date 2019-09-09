@@ -104,7 +104,7 @@ class UserViewSet(viewsets.ModelViewSet):
             data = serializer.data
             data.pop('ScrumyGoals')
             return Response(
-                {'success': 'ok', 'user':data}, 
+                {'success': 'ok', 'user':data, 'token':''}, 
                 status=status.HTTP_200_OK
             )
         raise AuthenticationFailed
