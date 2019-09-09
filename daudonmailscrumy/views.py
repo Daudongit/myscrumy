@@ -62,19 +62,23 @@ class ScrumGoalViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         if request.data['mode'] == 'changeowner':
             instance.user = ScrumUser.objects.get(pk=request.data['user_id'])
-            instance.goal_status = GoalStatus.objects.get(pk=request.data['goal_status'])
+            instance.goal_status = GoalStatus.objects.get(
+                status_name=request.data['status_name']
+            )
             # instance.goal_status = GoalStatus.objects.get(status_name="Weekly Goal")
         if request.data['mode'] == 'editgoal':
             instance.goal_name = request.data['goal_name']
         instance.save()
         return Response(
-            {'success': 'owner updated','goal_id':instance.goal_id}, 
+            {'success': 'owner updated', 'goal_id':instance.goal_id}, 
             status=status.HTTP_202_ACCEPTED
         )
 
     def partial_update(self, request, pk=None):
         instance = self.get_object()
-        goal_status = GoalStatus.objects.get(pk=request.data['goal_status']['id'])
+        goal_status = GoalStatus.objects.get(
+            status_name=request.data['status_name']
+        )
         instance.goal_status = goal_status
         instance.save()
         
