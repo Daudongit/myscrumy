@@ -29,6 +29,12 @@ class ScrumUserManager(BaseUserManager):
 
         return user
 
+class Company(models.Model):
+    name = models.CharField(max_length=150, default='linuxjobber')
+
+    def __str__(self):
+        return self.name
+
 class ScrumUser(AbstractBaseUser, PermissionsMixin):
     USERTYPE = (('O', 'Owner'), ('U', 'User'))
 
