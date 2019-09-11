@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 # from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from account.models import ScrumUser
+from account.models import ScrumUser, Company
 
 from .csrf_exempt import CsrfExemptSessionAuthentication
 from .models import GoalStatus, ScrumyGoals, User
@@ -28,6 +28,7 @@ class ScrumUserViewSet(viewsets.ModelViewSet):
     permission_classes = []
 
     def create(self, request):
+        request.data['company_id'] = 1
         serializer = ScrumUserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -128,7 +129,8 @@ class CustomAuthToken(ObtainAuthToken):
             'token': token.key,
             'user': {
                 'username':user.username,   
-                'user_type':user.user_type
+                'user_type':user.user_type,
+                'company':{'name':Company.objects.get(pk=user.company_id).name}
             }
         })
 
