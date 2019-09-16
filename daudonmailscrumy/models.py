@@ -4,6 +4,10 @@ from django.contrib.auth import get_user_model
 
 AuthUser = get_user_model()
 
+class Project(models.Model):
+    title = models.CharField(max_length=50)
+    user = models.ManyToManyField(AuthUser, blank=True)
+
 class GoalStatus(models.Model):
     status_name = models.CharField(max_length=20)
 
@@ -42,3 +46,5 @@ class ScrumyHistory(models.Model):
 class User(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+
+    
