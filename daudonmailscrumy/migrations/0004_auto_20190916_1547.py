@@ -10,10 +10,10 @@ class Migration(migrations.Migration):
         ('daudonmailscrumy', '0003_project'),
     ]
 
-    # operations = [
-    #     migrations.AlterField(
-    #         model_name='project',
-    #         name='user',
-    #         field=models.ManyToManyField(blank=True, to=settings.AUTH_USER_MODEL),
-    #     ),
-    # ]
+    operations = [
+        migrations.AlterField(
+            model_name='project',
+            name='user',
+            field=models.ManyToManyField(blank=True, to=settings.AUTH_USER_MODEL),
+        ),
+    ]

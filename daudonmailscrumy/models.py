@@ -22,6 +22,7 @@ class ScrumyGoals(models.Model):
     owner = models.CharField(max_length=50)
     goal_status = models.ForeignKey(GoalStatus, on_delete=models.PROTECT)
     user = models.ForeignKey(AuthUser, related_name='ScrumyGoals', on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, default=1, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.goal_name
