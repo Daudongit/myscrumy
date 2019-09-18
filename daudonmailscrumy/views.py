@@ -31,8 +31,11 @@ class ScrumUserViewSet(viewsets.ModelViewSet):
     permission_classes = []
 
     def create(self, request):
+        print(request)
         request.data['company_id'] = 1
-        serializer = ScrumUserSerializer(data=request.data)
+        serializer = ScrumUserSerializer(
+            data=request.data, context={'request':request}
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
