@@ -9,6 +9,7 @@ router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'scrumuser', views.ScrumUserViewSet)
 router.register(r'scrumgoal', views.ScrumGoalViewSet)
+router.register(r'project', views.ProjectViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),

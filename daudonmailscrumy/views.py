@@ -1,24 +1,27 @@
 
 import random
-
+# from rest_framework.decorators import action
 from django.contrib.auth import authenticate, get_user_model, login
+from django.shortcuts import get_object_or_404
 # from django.contrib.auth.models import User
 from rest_framework import status, viewsets
 from rest_framework.authentication import (BasicAuthentication,
                                            TokenAuthentication)
-from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
-# from rest_framework.decorators import action
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from account.models import ScrumUser, Company
+from account.models import Company, ScrumUser
 
 from .csrf_exempt import CsrfExemptSessionAuthentication
-from .models import GoalStatus, ScrumyGoals, User
-from .serializers import (ScrumGoalSerializer, ScrumUserSerializer,
-                          UserSerializer)
+from .models import GoalStatus, Project, ScrumyGoals, User
+from .serializers import (
+    ScrumGoalSerializer, ScrumUserSerializer,
+    UserSerializer, ProjectSerializer
+)
 
 # from rest_framework import permissions
 
@@ -34,7 +37,21 @@ class ScrumUserViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors)
-        # return Response({'created': False})
+    
+    def retrieve(self, request, pk=None):
+        # print(request.query_params.get('project'))
+        queryset = ScrumUser.objects.all()
+        user = get_object_or_404(queryset, pk=pk)
+        serializer = ScrumUserSerializer(user, context={'request':request})
+        return Response(serializer.data)
+
+    # @action(methods=['post'], detail=False)
+    # def myscrum(self, request, *args, **kwargs):
+    #     # users = 
+    #     return Response(
+    #         {'success': 'sucessfully tested'},
+    #         status=status.HTTP_202_ACCEPTED
+    #     )
 
 
 class ScrumGoalViewSet(viewsets.ModelViewSet):
@@ -42,6 +59,10 @@ class ScrumGoalViewSet(viewsets.ModelViewSet):
     serializer_class = ScrumGoalSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+
+    # def get_queryset(self):
+    #     # return ScrumyGoals.objects.filter(project=self.request.project)
+    #     return ScrumyGoals.objects.filter(project=2)
 
     def create(self, request):
         goal_creator = request.user
@@ -52,6 +73,7 @@ class ScrumGoalViewSet(viewsets.ModelViewSet):
         request_data['owner'] = goal_creator.username
         # request_data['goal_status'] = GoalStatus.objects.get(status_name="Weekly Goal")
         request_data['user'] = goal_creator.id
+        request_data['project'] = request.data['project_id']
         serializer = ScrumGoalSerializer(data=request_data)
         if serializer.is_valid():
             serializer.save()
@@ -128,11 +150,19 @@ class CustomAuthToken(ObtainAuthToken):
             'success':'ok',
             'token': token.key,
             'user': {
+                'id':user.id,   
                 'username':user.username,   
                 'user_type':user.user_type,
-                'company':{'name':Company.objects.get(pk=user.company_id).name}
+                'company':{'name':Company.objects.get(pk=user.company_id).name},
+                'project':Project.objects.get(title=request.data['project']).id
             }
         })
+
+class ProjectViewSet(viewsets.ModelViewSet):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    # authentication_classes = (TokenAuthentication,)
+    # permission_classes = (IsAuthenticated,)
 
 #goal_id generator helper
 def generate_goal_id():

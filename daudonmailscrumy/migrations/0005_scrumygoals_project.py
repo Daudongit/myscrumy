@@ -10,10 +10,10 @@ class Migration(migrations.Migration):
         ('daudonmailscrumy', '0004_auto_20190916_1547'),
     ]
 
-    # operations = [
-    #     migrations.AddField(
-    #         model_name='scrumygoals',
-    #         name='project',
-    #         field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='daudonmailscrumy.Project'),
-    #     ),
-    # ]
+    operations = [
+        migrations.AddField(
+            model_name='scrumygoals',
+            name='project',
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='daudonmailscrumy.Project'),
+        ),
+    ]

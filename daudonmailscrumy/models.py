@@ -8,6 +8,9 @@ class Project(models.Model):
     title = models.CharField(max_length=50)
     user = models.ManyToManyField(AuthUser, blank=True)
 
+    def __str__(self):
+        return self.title
+
 class GoalStatus(models.Model):
     status_name = models.CharField(max_length=20)
 

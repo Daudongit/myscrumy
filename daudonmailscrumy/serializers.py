@@ -2,7 +2,7 @@
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import ScrumyGoals, GoalStatus, User
+from .models import ScrumyGoals, GoalStatus, User, Project
 from  account.models import ScrumUser, Company
 
 # User = get_user_model()
@@ -11,9 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
-        # extra_kwargs = {
-        #     'password': {'write_only': True}
-        # }
+       
 
 class GoalStatusSerializer(serializers.ModelSerializer):
     class Meta:
@@ -41,7 +39,8 @@ class ScrumGoalSerializer(serializers.ModelSerializer):
             'created_by': {'write_only': True},
             'moved_by': {'write_only': True},
             'owner': {'write_only': True},
-            'user': {'write_only': True}
+            'user': {'write_only': True},
+            'project': {'write_only': True}
         }
 
 class CompanySerializer(serializers.ModelSerializer):
@@ -49,8 +48,31 @@ class CompanySerializer(serializers.ModelSerializer):
         model = Company
         fields = ('id', 'name')
 
+class FilteredListSerializer(serializers.ListSerializer):
+
+    def to_representation(self, data):
+        project_id = self.context['request'].query_params.get('project')
+        data = data.filter(project_id=project_id)
+        return super(FilteredListSerializer, self).to_representation(data)
+
+
+class ScrumGoalFilterSerializer(serializers.ModelSerializer):
+    goal_status = GoalStatusSerializer(many=False, read_only=True)
+
+    class Meta:
+        list_serializer_class = FilteredListSerializer
+        model = ScrumyGoals
+        fields = '__all__'
+        extra_kwargs = {
+            'created_by': {'write_only': True},
+            'moved_by': {'write_only': True},
+            'owner': {'write_only': True},
+            'user': {'write_only': True},
+            'project': {'write_only': True}
+        }
+
 class ScrumUserSerializer(serializers.ModelSerializer):
-    ScrumyGoals = ScrumGoalSerializer(many=True, read_only=True)
+    ScrumyGoals = ScrumGoalFilterSerializer(many=True, read_only=True)
     company = CompanySerializer(many=False, read_only=True)
     company_id = serializers.PrimaryKeyRelatedField(
         queryset=Company.objects.all(), source='company', write_only=True
@@ -75,3 +97,8 @@ class ScrumUserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
+
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ('id', 'title')
