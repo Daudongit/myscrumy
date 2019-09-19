@@ -101,4 +101,7 @@ class ScrumUserSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ('id', 'title')
+        fields = ('id', 'title', 'user')
+        extra_kwargs = {
+            'user': {'write_only': True}
+        }

@@ -3,6 +3,7 @@ import random
 # from rest_framework.decorators import action
 from django.contrib.auth import authenticate, get_user_model, login
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 # from django.contrib.auth.models import User
 from rest_framework import status, viewsets
 from rest_framework.authentication import (BasicAuthentication,
@@ -30,19 +31,23 @@ class ScrumUserViewSet(viewsets.ModelViewSet):
     serializer_class = ScrumUserSerializer
     permission_classes = []
 
+    @transaction.atomic
     def create(self, request):
-        print(request)
         request.data['company_id'] = 1
         serializer = ScrumUserSerializer(
             data=request.data, context={'request':request}
         )
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
+            if 'project' in request.data:
+                project = Project(
+                    title=request.data['project'], created_by=user.username
+                )
+                project.save()
             return Response(serializer.data)
         return Response(serializer.errors)
     
     def retrieve(self, request, pk=None):
-        # print(request.query_params.get('project'))
         queryset = ScrumUser.objects.all()
         user = get_object_or_404(queryset, pk=pk)
         serializer = ScrumUserSerializer(user, context={'request':request})
@@ -76,10 +81,13 @@ class ScrumGoalViewSet(viewsets.ModelViewSet):
         request_data['owner'] = goal_creator.username
         # request_data['goal_status'] = GoalStatus.objects.get(status_name="Weekly Goal")
         request_data['user'] = goal_creator.id
-        request_data['project'] = request.data['project_id']
+        project_id = request.data['project_id']
+        request_data['project'] = project_id
         serializer = ScrumGoalSerializer(data=request_data)
         if serializer.is_valid():
             serializer.save()
+            if not goal_creator.project_set.filter(pk=project_id).exists():
+                goal_creator.project_set.add(project_id)
             return Response(serializer.data)
         return Response(serializer.errors)  
     
@@ -87,7 +95,9 @@ class ScrumGoalViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         instance = self.get_object()
         if request.data['mode'] == 'changeowner':
-            instance.user = ScrumUser.objects.get(pk=request.data['user_id'])
+            instance.user = ScrumUser.objects.get(
+                pk=request.data['user_id']
+            )
             instance.goal_status = GoalStatus.objects.get(
                 status_name=request.data['status_name']
             )
@@ -116,13 +126,19 @@ class ScrumGoalViewSet(viewsets.ModelViewSet):
         # serializer.update(instance, validated_data={'goal_status_id':goal_status.id})
         # new_instance = serializer.save()
         # return Response(serializer.data)
-        return Response({'success': 'status updated'}, status=status.HTTP_202_ACCEPTED)
+        return Response(
+            {'success': 'status updated'}, 
+            status=status.HTTP_202_ACCEPTED
+        )
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
+    authentication_classes = (
+        CsrfExemptSessionAuthentication, 
+        BasicAuthentication
+    )
     
     def create(self, request):
         username = request.data['username']
@@ -166,6 +182,17 @@ class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
     # authentication_classes = (TokenAuthentication,)
     # permission_classes = (IsAuthenticated,)
+
+
+    @action(detail=True)
+    def actives(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        projects = Project.objects.filter(user__id=pk)
+        serializer = self.serializer_class(projects, many=True)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
 
 #goal_id generator helper
 def generate_goal_id():

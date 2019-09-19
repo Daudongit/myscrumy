@@ -6,6 +6,7 @@ AuthUser = get_user_model()
 
 class Project(models.Model):
     title = models.CharField(max_length=50)
+    created_by = models.CharField(max_length=100, default='louis')
     user = models.ManyToManyField(AuthUser, blank=True)
 
     def __str__(self):
