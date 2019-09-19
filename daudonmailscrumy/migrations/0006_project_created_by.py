@@ -9,10 +9,10 @@ class Migration(migrations.Migration):
         ('daudonmailscrumy', '0005_scrumygoals_project'),
     ]
 
-    # operations = [
-    #     migrations.AddField(
-    #         model_name='project',
-    #         name='created_by',
-    #         field=models.CharField(default='louis', max_length=100),
-    #     ),
-    # ]
+    operations = [
+        migrations.AddField(
+            model_name='project',
+            name='created_by',
+            field=models.CharField(default='louis', max_length=100),
+        ),
+    ]
