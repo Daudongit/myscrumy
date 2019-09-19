@@ -97,7 +97,7 @@ DATABASES = {
     #     }
     # }
     'default': {
-        'ENGINE': 'mysql.connector.django',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'daudonmailscrumy',
         'USER':'daud',
         'PASSWORD':'P@55w0rd',
