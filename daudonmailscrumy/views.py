@@ -31,6 +31,15 @@ class ScrumUserViewSet(viewsets.ModelViewSet):
     serializer_class = ScrumUserSerializer
     permission_classes = []
 
+    def list(self, request, *kwargs):
+        queryset = ScrumUser.objects.filter(
+            project__id=request.query_params.get('project')
+        )
+        serializer = self.serializer_class(
+            queryset, many=True, context={'request':request}
+        )
+        return Response(serializer.data)
+
     @transaction.atomic
     def create(self, request):
         request.data['company_id'] = 1
@@ -86,8 +95,8 @@ class ScrumGoalViewSet(viewsets.ModelViewSet):
         serializer = ScrumGoalSerializer(data=request_data)
         if serializer.is_valid():
             serializer.save()
-            if not goal_creator.project_set.filter(pk=project_id).exists():
-                goal_creator.project_set.add(project_id)
+            # if not goal_creator.project_set.filter(pk=project_id).exists():
+            #     goal_creator.project_set.add(project_id)
             return Response(serializer.data)
         return Response(serializer.errors)  
     
@@ -140,6 +149,7 @@ class UserViewSet(viewsets.ModelViewSet):
         BasicAuthentication
     )
     
+    #login for session auth
     def create(self, request):
         username = request.data['username']
         password = request.data['password']
@@ -165,6 +175,9 @@ class CustomAuthToken(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, _ = Token.objects.get_or_create(user=user)
+        project = Project.objects.get(title=request.data['project'])
+        if not user.project_set.filter(pk=project.id).exists():
+                user.project_set.add(project.id)
         return Response({
             'success':'ok',
             'token': token.key,
@@ -173,7 +186,8 @@ class CustomAuthToken(ObtainAuthToken):
                 'username':user.username,   
                 'user_type':user.user_type,
                 'company':{'name':Company.objects.get(pk=user.company_id).name},
-                'project':Project.objects.get(title=request.data['project']).id
+                'project':project.id,
+                'project_creator':project.created_by
             }
         })
 

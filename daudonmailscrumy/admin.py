@@ -8,7 +8,7 @@ class ScrumyGoalsAdmin(admin.ModelAdmin):
     list_display = ('id', 'goal_name', 'goal_status')
 
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title')
+    list_display = ('id', 'title', 'created_by')
 
 admin.site.register(GoalStatus, GoalStatusAdmin)
 admin.site.register(ScrumyGoals, ScrumyGoalsAdmin)
