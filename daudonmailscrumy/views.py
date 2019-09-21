@@ -181,13 +181,13 @@ class CustomAuthToken(ObtainAuthToken):
         return Response({
             'success':'ok',
             'token': token.key,
+            'project':project.id,
+            'project_creator':project.created_by,
             'user': {
                 'id':user.id,   
                 'username':user.username,   
                 'user_type':user.user_type,
                 'company':{'name':Company.objects.get(pk=user.company_id).name},
-                'project':project.id,
-                'project_creator':project.created_by
             }
         })
 
@@ -196,7 +196,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
     # authentication_classes = (TokenAuthentication,)
     # permission_classes = (IsAuthenticated,)
-
 
     @action(detail=True)
     def actives(self, request, *args, **kwargs):
