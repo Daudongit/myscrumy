@@ -73,10 +73,10 @@ class ScrumGoalFilterSerializer(serializers.ModelSerializer):
 
 class ScrumUserSerializer(serializers.ModelSerializer):
     ScrumyGoals = ScrumGoalFilterSerializer(many=True, read_only=True)
-    company = CompanySerializer(many=False, read_only=True)
-    company_id = serializers.PrimaryKeyRelatedField(
-        queryset=Company.objects.all(), source='company', write_only=True
-    )
+    # company = CompanySerializer(many=False, read_only=True)
+    # company_id = serializers.PrimaryKeyRelatedField(
+    #     queryset=Company.objects.all(), source='company', write_only=True
+    # )
     
     def create(self, validated_data):
         password = validated_data.get('password')
@@ -91,8 +91,8 @@ class ScrumUserSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'username', 
             'full_name', 'user_type', 
-            'password', 'ScrumyGoals',
-            'company','company_id'
+            'password', 'ScrumyGoals'
+            # 'company','company_id'
         )
         extra_kwargs = {
             'password': {'write_only': True}

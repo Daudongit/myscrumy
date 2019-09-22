@@ -37,17 +37,16 @@ class Company(models.Model):
 
 class ScrumUser(AbstractBaseUser, PermissionsMixin):
     USERTYPE = (('O', 'Owner'), ('U', 'User'))
-    DEFAULT_COMPANY = 1
+    # DEFAULT_COMPANY = 1
 
     username = models.CharField(db_index=True, max_length=255, unique=True)
-    # password = models.CharField(max_length=50)
     full_name = models.CharField(max_length=150)
     user_type = models.CharField(choices=USERTYPE, max_length=1)
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    company = models.ForeignKey(Company, on_delete=models.PROTECT, default=DEFAULT_COMPANY)
+    # company = models.ForeignKey(Company, on_delete=models.PROTECT, default=DEFAULT_COMPANY)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []

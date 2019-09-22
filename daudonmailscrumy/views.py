@@ -2,6 +2,7 @@
 import random
 # from rest_framework.decorators import action
 from django.contrib.auth import authenticate, get_user_model, login
+from django.contrib.auth.models import Group
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 # from django.contrib.auth.models import User
@@ -15,7 +16,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from account.models import Company, ScrumUser
+from account.models import ScrumUser
 
 from .csrf_exempt import CsrfExemptSessionAuthentication
 from .models import GoalStatus, Project, ScrumyGoals, User
@@ -42,12 +43,13 @@ class ScrumUserViewSet(viewsets.ModelViewSet):
 
     @transaction.atomic
     def create(self, request):
-        request.data['company_id'] = 1
         serializer = ScrumUserSerializer(
             data=request.data, context={'request':request}
         )
         if serializer.is_valid():
             user = serializer.save()
+            developer_group = Group.objects.get(name='Developer') 
+            developer_group.user_set.add(user)
             if 'project' in request.data:
                 project = Project(
                     title=request.data['project'], created_by=user.username
@@ -186,8 +188,7 @@ class CustomAuthToken(ObtainAuthToken):
             'user': {
                 'id':user.id,   
                 'username':user.username,   
-                'user_type':user.user_type,
-                'company':{'name':Company.objects.get(pk=user.company_id).name},
+                'user_type':user.user_type
             }
         })
 
